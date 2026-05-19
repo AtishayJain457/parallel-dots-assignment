@@ -4,19 +4,14 @@ import easyocr
 import cv2
 import os
 
-# -----------------------------------
 # LOAD PRETRAINED YOLO MODEL
-# -----------------------------------
+
 model = YOLO("yolov8n.pt")
 
-# -----------------------------------
 # INITIALIZE OCR READER
-# -----------------------------------
 reader = easyocr.Reader(['en'])
 
-# -----------------------------------
 # BRAND KEYWORDS
-# -----------------------------------
 brand_keywords = {
 
     "Coca-Cola": [
@@ -111,14 +106,10 @@ brand_keywords = {
     ]
 }
 
-# -----------------------------------
 # CREATE OUTPUT DIRECTORY
-# -----------------------------------
 os.makedirs("data/output", exist_ok=True)
 
-# -----------------------------------
 # PROCESS ALL INPUT IMAGES
-# -----------------------------------
 for image_name in os.listdir("data/input"):
 
     # Skip non-image files
@@ -129,62 +120,42 @@ for image_name in os.listdir("data/input"):
     print(f"PROCESSING IMAGE: {image_name}")
     print("===================================\n")
 
-    # -----------------------------------
     # FULL IMAGE PATH
-    # -----------------------------------
     image_path = os.path.join("data/input", image_name)
 
-    # -----------------------------------
     # READ IMAGE
-    # -----------------------------------
     image = cv2.imread(image_path)
 
-    # -----------------------------------
     # RUN YOLO DETECTION
-    # -----------------------------------
+    
     results = model(image_path)
 
-    # -----------------------------------
     # STORE BRAND COUNTS
-    # -----------------------------------
     brand_counts = {}
 
-    # -----------------------------------
     # STORE UNIQUE OCR LABELS
-    # -----------------------------------
     ocr_labels = set()
 
-    # -----------------------------------
-    # TOTAL PRODUCTS COUNTER
-    # -----------------------------------
+  
     total_products = 0
 
-    # -----------------------------------
-    # LOOP THROUGH DETECTIONS
-    # -----------------------------------
+ 
     for result in results:
 
         boxes = result.boxes
 
         for box in boxes:
 
-            # -----------------------------------
             # CONFIDENCE SCORE
-            # -----------------------------------
             confidence = float(box.conf[0])
 
             # Skip weak detections
             if confidence < 0.50:
                 continue
-
-            # -----------------------------------
             # BOUNDING BOX COORDINATES
-            # -----------------------------------
             x1, y1, x2, y2 = map(int, box.xyxy[0])
 
-            # -----------------------------------
             # FILTER VERY SMALL DETECTIONS
-            # -----------------------------------
             width = x2 - x1
             height = y2 - y1
 
@@ -193,23 +164,16 @@ for image_name in os.listdir("data/input"):
 
             total_products += 1
 
-            # -----------------------------------
-            # CROP DETECTED PRODUCT
-            # -----------------------------------
+            
             crop = image[y1:y2, x1:x2]
 
             # Skip invalid crop
             if crop.size == 0:
                 continue
 
-            # -----------------------------------
-            # RESIZE FOR BETTER OCR
-            # -----------------------------------
             crop = cv2.resize(crop, None, fx=2, fy=2)
 
-            # -----------------------------------
-            # OCR ON CROPPED PRODUCT
-            # -----------------------------------
+            -
             ocr_results = reader.readtext(crop)
 
             detected_text = ""
@@ -218,26 +182,26 @@ for image_name in os.listdir("data/input"):
             for detection in ocr_results:
                 detected_text += detection[1] + " "
 
-            # -----------------------------------
-            # CLEAN OCR TEXT
-            # -----------------------------------
+            
+            # CLEANING OCR TEXT FOR BETTER READING / UNDERSTANDING
+            
             detected_text = detected_text.lower().strip()
             detected_text = detected_text.replace("\n", " ")
 
-            # -----------------------------------
+            
             # DEBUG OCR OUTPUT
-            # -----------------------------------
-            print("\n--------------------------------")
+            
+           
             print("OCR Text:", detected_text)
 
-            # -----------------------------------
+            
             # DEFAULT BRAND
-            # -----------------------------------
+            
             detected_brand = "Other"
 
-            # -----------------------------------
-            # KEYWORD MATCHING
-            # -----------------------------------
+            
+            # CHECKING KEYWORD ARE MATCHING
+            
             for brand, keywords in brand_keywords.items():
 
                 found = False
@@ -252,23 +216,21 @@ for image_name in os.listdir("data/input"):
                 if found:
                     break
 
-            # -----------------------------------
-            # STORE CLEAN OCR LABELS
-            # -----------------------------------
+            -
             if detected_brand != "Other":
                 ocr_labels.add(detected_brand)
 
-            # -----------------------------------
-            # UPDATE BRAND COUNTS
-            # -----------------------------------
+           
+            # UPDATING  BRAND COUNTS
+            
             if detected_brand not in brand_counts:
                 brand_counts[detected_brand] = 0
 
             brand_counts[detected_brand] += 1
 
-            # -----------------------------------
+           
             # DRAW BOUNDING BOX
-            # -----------------------------------
+            
             cv2.rectangle(
                 image,
                 (x1, y1),
@@ -277,14 +239,10 @@ for image_name in os.listdir("data/input"):
                 1
             )
 
-            # -----------------------------------
-            # LABEL TEXT
-            # -----------------------------------
+          
             label = f"{detected_brand}"
 
-            # -----------------------------------
-            # FONT SETTINGS
-            # -----------------------------------
+           
             font = cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 0.45
             thickness = 1
@@ -297,9 +255,7 @@ for image_name in os.listdir("data/input"):
                 thickness
             )
 
-            # -----------------------------------
-            # DRAW LABEL BACKGROUND
-            # -----------------------------------
+            # labelling the background
             cv2.rectangle(
                 image,
                 (x1, y1 - text_height - 8),
@@ -308,9 +264,7 @@ for image_name in os.listdir("data/input"):
                 -1
             )
 
-            # -----------------------------------
-            # PUT LABEL TEXT
-            # -----------------------------------
+            # putting text on label upper side
             cv2.putText(
                 image,
                 label,
@@ -321,19 +275,13 @@ for image_name in os.listdir("data/input"):
                 thickness
             )
 
-    # -----------------------------------
-    # OUTPUT IMAGE PATH
-    # -----------------------------------
+# image path
     output_path = f"data/output/brand_detection_{image_name}"
 
-    # -----------------------------------
-    # SAVE OUTPUT IMAGE
-    # -----------------------------------
+# saving o/p name
     cv2.imwrite(output_path, image)
 
-    # -----------------------------------
-    # PRINT FINAL RESULTS
-    # -----------------------------------
+   
     print("\n===================================")
     print(" BRAND DETECTION COMPLETED ")
     print("===================================\n")
@@ -347,14 +295,10 @@ for image_name in os.listdir("data/input"):
     print("\nOutput Image Saved At:")
     print(output_path)
 
-    # -----------------------------------
-    # CONVERT SET TO LIST
-    # -----------------------------------
+   # here converting sets to list
     ocr_labels = list(ocr_labels)
 
-    # -----------------------------------
-    # SAVE JSON RESULTS
-    # -----------------------------------
+ # saving result in json
     save_results(
         image_name=image_name,
         total_products=total_products,
