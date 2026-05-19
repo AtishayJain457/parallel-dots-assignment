@@ -1,10 +1,6 @@
 # Retail Shelf Intelligence Pipeline
 
-## Architecture Diagram
 
-The overall pipeline architecture is shown below:
-
-![Architecture Diagram](architecture_diagram.png)
 
 ---
 
