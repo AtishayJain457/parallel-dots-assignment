@@ -1,0 +1,21 @@
+{
+    "image_name": "shelf_1.jpg",
+    "total_products": 39,
+    "brands": {
+        "Other": 23,
+        "Coca-Cola": 4,
+        "Fanta": 4,
+        "Sprite": 3,
+        "Gatorade": 1,
+        "Pepsi": 2,
+        "7UP": 2
+    },
+    "ocr_labels": [
+        "7UP",
+        "Pepsi",
+        "Gatorade",
+        "Coca-Cola",
+        "Fanta",
+        "Sprite"
+    ]
+}
