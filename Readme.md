@@ -154,10 +154,15 @@ The pipeline generates:
 
 ## Limitations
 
-- Generic YOLO models may miss densely packed products.
-- OCR quality decreases for blurry or partially visible products.
-- Some products may be classified as `"Other"` due to OCR noise.
-- Keyword matching is heuristic-based and depends on OCR quality.
+- The pipeline uses a generic pretrained YOLOv8 model rather than a retail-specific detection model, which can reduce detection precision for densely packed shelves.
+
+- OCR quality is highly dependent on product visibility, image resolution, text orientation, and lighting conditions.
+
+- Some products are classified as `"Other"` when OCR text is noisy or insufficient for reliable keyword matching.
+
+- The current classification approach uses lightweight heuristic keyword mapping instead of a dedicated trained brand-classification network.
+
+- Shelf images containing overlapping or partially occluded products may reduce OCR and classification accuracy.
 
 ---
 
